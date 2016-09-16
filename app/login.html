@@ -115,7 +115,9 @@
 			</form>
 			<div class="mui-content-padded">
 				<button id='login' class="mui-btn mui-btn-block mui-btn-primary">登录</button>
-				<div class="link-area"><a id='reg'>注册账号</a> <span class="spliter">|</span> <a id='forgetPassword'>忘记密码</a>
+				<div class="link-area">
+					<a id='reg'>注册账号</a> <span class="spliter">|</span>
+					<a id='forgetPassword'>忘记密码</a>
 				</div>
 			</div>
 			<div class="mui-content-padded oauth-area">
@@ -125,8 +127,9 @@
 		<script src="js/mui.min.js"></script>
 		<script src="js/mui.enterfocus.js"></script>
 		<script src="js/app.js"></script>
+		<script src="libs/zepto_1.1.3.js" type="text/javascript" charset="utf-8"></script>
 		<script>
-			(function($, doc) {
+			(function($, doc, $z) {
 				$.init({
 					statusBarBackground: '#f7f7f7'
 				});
@@ -139,22 +142,56 @@
 						"url": 'main.html'
 					});
 					var main_loaded_flag = false;
-					mainPage.addEventListener("loaded",function () {
+					mainPage.addEventListener("loaded", function() {
 						main_loaded_flag = true;
 					});
 					var toMain = function() {
 						//使用定时器的原因：
 						//可能执行太快，main页面loaded事件尚未触发就执行自定义事件，此时必然会失败
-						var id = setInterval(function () {
-							if(main_loaded_flag){
+						var id = setInterval(function() {
+							console.log('123'+main_loaded_flag)
+							if(main_loaded_flag) {
 								clearInterval(id);
 								$.fire(mainPage, 'show', null);
 								mainPage.show("pop-in");
 							}
-						},20);
+						}, 20);
 					};
-					//检查 "登录状态/锁屏状态" 开始
-					if (settings.autoLogin && state.token && settings.gestures) {
+					var checkLogin = function(loginInfo, callback) {
+						loginInfo = loginInfo || {};
+						loginInfo.account = loginInfo.account || '';
+						loginInfo.password = loginInfo.password || '';
+						if(loginInfo.account.length < 5) {
+							return callback('账号最短为 5 个字符');
+						}
+						if(loginInfo.password.length < 6) {
+							return callback('密码最短为 6 个字符');
+						}
+						   return callback(false);
+					}
+					
+					var doLogin = function(login_info) {
+							var account = login_info.account,
+								password = login_info.password;
+							
+							console.log(login_info)
+							$z.ajax({
+								type: "post",
+								contentType: 'application/x-www-form-urlencoded', //跨域请求 用formData格式传输
+								data: 'account=' + account + '&password=' + password,
+								url: "http://192.168.1.102:3000/passport/login", //请求地址        
+								dataType: 'json',
+								success: function(data) {
+									if(data.success) {
+										toMain()
+									} else {
+										plus.nativeUI.toast(data.msg);
+									}
+								}
+							});
+						}
+						//检查 "登录状态/锁屏状态" 开始
+					if(settings.autoLogin && state.token && settings.gestures) {
 						$.openWindow({
 							url: 'unlock.html',
 							id: 'unlock',
@@ -165,7 +202,7 @@
 								autoShow: false
 							}
 						});
-					} else if (settings.autoLogin && state.token) {
+					} else if(settings.autoLogin && state.token) {
 						toMain();
 					} else {
 						app.setState(null);
@@ -174,10 +211,10 @@
 						var auths = {};
 						var oauthArea = doc.querySelector('.oauth-area');
 						plus.oauth.getServices(function(services) {
-							for (var i in services) {
+							for(var i in services) {
 								var service = services[i];
 								auths[service.id] = service;
-								if (~authBtns.indexOf(service.id)) {
+								if(~authBtns.indexOf(service.id)) {
 									var isInstalled = app.isInstalled(service.id);
 									var btn = document.createElement('div');
 									//如果微信未安装，则为不启用状态
@@ -188,7 +225,7 @@
 								}
 							}
 							$(oauthArea).on('tap', '.oauth-btn', function() {
-								if (this.classList.contains('disabled')) {
+								if(this.classList.contains('disabled')) {
 									plus.nativeUI.toast('您尚未安装微信客户端');
 									return;
 								}
@@ -233,13 +270,16 @@
 							account: accountBox.value,
 							password: passwordBox.value
 						};
-						app.login(loginInfo, function(err) {
-							if (err) {
-								plus.nativeUI.toast(err);
+						checkLogin(loginInfo,function(err){
+
+							if(err){
+							console.log(err);
+	plus.nativeUI.toast(err);
 								return;
 							}
-							toMain();
-						});
+							doLogin(loginInfo);
+							
+						})
 					});
 					$.enterfocus('#login-form input', function() {
 						$.trigger(loginButton, 'tap');
@@ -292,7 +332,7 @@
 					var backButtonPress = 0;
 					$.back = function(event) {
 						backButtonPress++;
-						if (backButtonPress > 1) {
+						if(backButtonPress > 1) {
 							plus.runtime.quit();
 						} else {
 							plus.nativeUI.toast('再按一次退出应用');
@@ -303,7 +343,7 @@
 						return false;
 					};
 				});
-			}(mui, document));
+			}(mui, document, Zepto));
 		</script>
 	</body>
 

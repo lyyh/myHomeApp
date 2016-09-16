@@ -15,7 +15,7 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
+// uncomment after placing zyour favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -26,15 +26,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/passport',passport);
-
-app.use('/register',function(req,res,next){
-  console.log(req.body)
-  res.header("Access-Control-Allow-Origin", "*");
-  if(req.body){
-    // console.log(body)
-  }
-  res.jsonp({'name':'liu'})
-})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

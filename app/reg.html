@@ -97,39 +97,41 @@
 							plus.nativeUI.toast('密码两次输入不一致');
 							return;
 						}
-//						app.reg(regInfo, function(err) {
-//							if(err) {
-//								plus.nativeUI.toast(err);
-//								return;
-//							}
-//							postData();
-//							
-//							plus.nativeUI.toast('注册成功');
-//							$.openWindow({
-//								url: 'login.html',
-//								id: 'login',
-//								show: {
-//									aniShow: 'pop-in'
-//								}
-//							});
-//						});
-				postData(regInfo)
+						app.reg(regInfo, function(err) {
+							if(err) {
+								plus.nativeUI.toast(err);
+								return;
+							}
+							postData(regInfo);
+						});
 					});
+					
+					//提交数据
+					function postData(reg_data) {
+						$z.ajax({
+							type: "post",
+							contentType: 'application/x-www-form-urlencoded', //跨域请求 用formData格式传输
+							data: 'account=' + reg_data.account + '&password=' + reg_data.password + '&email=' + reg_data.email,
+							url: "http://192.168.1.102:3000/passport/register", //请求地址        
+							dataType: 'json',
+							success: function(data) {
+								if(data.success) {
+									plus.nativeUI.toast(data.msg);
+									$.openWindow({
+										url: 'login.html',
+										id: 'login',
+										show: {
+											aniShow: 'pop-in'
+										}
+									});
+								} else {
+									plus.nativeUI.toast(data.msg);
+								}
+							}
+						});
+					}
 				});
 
-				function postData(reg_data) {
-					$z.ajax({
-						type: "post",
-						contentType: 'application/x-www-form-urlencoded',
-						data: 'account='+reg_data.account+'&password='+reg_data.password+'&email='+reg_data.email,
-						url: "http://192.168.1.102:3000/register", //请求地址        
-						dataType: 'json', //固定值  
-						success: function(data) { //成功后的回调函数,返回的数据放在data参数里  
-							//              console.log(data);
-							console.log(data);
-						}
-					});
-				}
 			}(mui, document, Zepto));
 		</script>
 	</body>
