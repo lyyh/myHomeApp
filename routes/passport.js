@@ -40,4 +40,19 @@ router.post('/login',function(req,res,next){
 	}
 })
 
+router.put('/loginout',function(req,res,next){
+	res.header("Access-Control-Allow-Origin", "*");
+	if (req.body) {
+		var passport_id = req.body.passportId;
+
+		//数据库操作
+		dbServer.loginOut(passport_id,res);
+	} else {
+		res.json({
+			success: false,
+			message: '操作失败!'
+		});
+	}
+})
+
 module.exports = router;

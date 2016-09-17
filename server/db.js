@@ -63,6 +63,9 @@ exports.addPassport = function(account, password, email, res) {
 
 //登录验证
 exports.loginCheck = function(account, password, res) {
+	var login_msg = {
+		account: account
+	};
 	pool.getConnection(function(err, connection) {
 
 		var task = [function(callback) {
@@ -104,7 +107,9 @@ exports.loginCheck = function(account, password, res) {
 							status: status.oprErr,
 							msg: status.msgOprErr
 						})
+						return
 					}
+					login_msg['passport_id'] = passport_id;
 					callback(err);
 				})
 		}, function(callback) {
@@ -125,7 +130,8 @@ exports.loginCheck = function(account, password, res) {
 				res.json({
 					success: true,
 					status: status.oprSuccess,
-					msg: '登录成功！'
+					msg: '登录成功!',
+					loginMsg: login_msg 					
 				})
 			}
 			connection.release();
@@ -134,9 +140,9 @@ exports.loginCheck = function(account, password, res) {
 }
 
 //注销账号
-exports.loginOut = function(account, res) {
+exports.loginOut = function(passport_id, res) {
 	pool.getConnection(function(err, connection) {
-		connection.query('UPDATE sys_passport SET passport_status = ? WHERE passport_acc = ?', [0, account],
+		connection.query('UPDATE sys_passport SET passport_status = ? WHERE passport_id = ?', [0, passport_id],
 			function(err, result) {
 				if (result.affectedRows == 0) {
 					res.json({
