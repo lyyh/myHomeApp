@@ -152,6 +152,7 @@ exports.loginOut = function(passport_id, res) {
 					})
 					return;
 				}else{
+					
 					res.json({
 						success: true,
 						status: status.oprSuccess,
