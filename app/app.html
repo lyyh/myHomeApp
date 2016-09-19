@@ -127,8 +127,8 @@
 		<script src="js/mui.min.js"></script>
 		<script src="js/mui.enterfocus.js"></script>
 		<script src="js/app.js"></script>
-		<script src="libs/zepto_1.1.3.js" type="text/javascript" charset="utf-8"></script>
-		<script src="js/conf.js" type="text/javascript" charset="utf-8"></script>
+		<!--<script src="libs/zepto_1.1.3.js" type="text/javascript" charset="utf-8"></script>-->
+		<!--<script src="js/conf.js" type="text/javascript" charset="utf-8"></script>-->
 		<script>
 			(function($, doc) {
 				$.init({
@@ -138,78 +138,43 @@
 				$.plusReady(function() {
 					plus.screen.lockOrientation("portrait-primary");
 					var settings = app.getSettings();
-//					localStorage.clear()
-
-					var mainPage = $.preload({
-						url: "main.html",
-						id: 'main',
-					})
-
-					//跳转到主页面
-					var toMain = function(login_msg) {
-						console.log(123)
-						//在本地保存登录状态
-						if(typeof login_msg === 'object' || login_msg){
-							localStorage.setItem("user_state", JSON.stringify(login_msg));
-						}
-						//使用定时器的原因：
-						//可能执行太快，main页面loaded事件尚未触发就执行自定义事件，此时必然会失败
-						var id = setInterval(function() {
-							clearInterval(id);
-							$.fire(mainPage,'mainPage',null);
-							mainPage.show('pop-in');
-						}, 20);
-					};
 
 					var user_state = localStorage.getItem('user_state');
-					if(typeof user_state === 'string' && user_state) {
+					console.log(user_state)
+					if(user_state && typeof user_state === 'string') {
+						
+						var mainPage = $.preload({
+							url: "main.html",
+							id: 'main'
+						})
+
+						//跳转到主页面
+						var toMain = function(login_msg) {
+							var id = setInterval(function() {
+								clearInterval(id);
+								$.fire(mainPage, 'mainPage', null);
+								mainPage.show('pop-in');
+							}, 20);
+						};
 						toMain();
+					} else {
+						var loginPage = $.preload({
+							url: "login.html",
+							id: 'login'
+						})
+
+						//跳转到主页面
+						var toLogin = function(login_msg) {
+							var id = setInterval(function() {
+								clearInterval(id);
+								$.fire(loginPage, 'loginPage', null);
+								loginPage.show('pop-in');
+							}, 20);
+						};
+						toLogin();
 					}
 
-					//检查登录输入
-					var checkLogin = function(loginInfo, callback) {
-						loginInfo = loginInfo || {};
-						loginInfo.account = loginInfo.account || '';
-						loginInfo.password = loginInfo.password || '';
-						if(loginInfo.account.length < 5) {
-							return callback('账号最短为 5 个字符');
-						}
-						if(loginInfo.password.length < 6) {
-							return callback('密码最短为 6 个字符');
-						}
-						return callback(false);
-					}
-
-					//进行登录
-					var doLogin = function(login_info) {
-						var account = login_info.account,
-							password = login_info.password;
-
-						$.ajax({
-							type: "post",
-							url: "http://" + config.ip + ":" + config.port + "/passport/login", //请求地址
-							async: true, //同步请求
-							data: {
-								account: account,
-								password: password
-							},
-							dataType: 'json',
-							crossDomain: true, //强制使用5+跨域
-							timeout: 10000,
-							success: function(data) {
-								if(data.success) {
-									toMain(data.loginMsg);
-								} else {
-									plus.nativeUI.toast(data.msg);
-								}
-							},
-							error: function(xhr, type, errorThrown) {
-								plus.nativeUI.toast('操作失败');
-							}
-						});
-					}
-
-					//检查 "登录状态/锁屏状态" 开始
+					//					//检查 "登录状态/锁屏状态" 开始
 					if(settings.autoLogin && state.token && settings.gestures) {
 						$.openWindow({
 							url: 'unlock.html',
@@ -285,65 +250,9 @@
 					var regButton = doc.getElementById('reg');
 					var forgetButton = doc.getElementById('forgetPassword');
 					//登录按钮监听事件
-					loginButton.addEventListener('tap', function(event) {
-						var loginInfo = {
-							account: accountBox.value,
-							password: passwordBox.value
-						};
-						//检查登录
-						checkLogin(loginInfo, function(err) {
-							if(err) {
-								plus.nativeUI.toast(err);
-								return;
-							}
-							console.log(111)
-							//进行登录
-							doLogin(loginInfo);
-						})
-					});
 					$.enterfocus('#login-form input', function() {
 						$.trigger(loginButton, 'tap');
 					});
-					autoLoginButton.classList[settings.autoLogin ? 'add' : 'remove']('mui-active')
-					autoLoginButton.addEventListener('toggle', function(event) {
-						setTimeout(function() {
-							var isActive = event.detail.isActive;
-							settings.autoLogin = isActive;
-							app.setSettings(settings);
-						}, 50);
-					}, false);
-					regButton.addEventListener('tap', function(event) {
-						$.openWindow({
-							url: 'reg.html',
-							id: 'reg',
-							preload: true,
-							show: {
-								aniShow: 'pop-in'
-							},
-							styles: {
-								popGesture: 'hide'
-							},
-							waiting: {
-								autoShow: false
-							}
-						});
-					}, false);
-					forgetButton.addEventListener('tap', function(event) {
-						$.openWindow({
-							url: 'forget_password.html',
-							id: 'forget_password',
-							preload: true,
-							show: {
-								aniShow: 'pop-in'
-							},
-							styles: {
-								popGesture: 'hide'
-							},
-							waiting: {
-								autoShow: false
-							}
-						});
-					}, false);
 					//
 					window.addEventListener('resize', function() {
 						oauthArea.style.display = document.body.clientHeight > 400 ? 'block' : 'none';

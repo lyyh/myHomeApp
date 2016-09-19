@@ -26,9 +26,9 @@ router.post('/register', function(req, res, next) {
 
 router.post('/login',function(req,res,next){
 	res.header("Access-Control-Allow-Origin", "*");
-	if (req.body) {
-		var account = req.body.account,
-			password = req.body.password;
+	if (req.body) {		
+			var account = req.body.account,
+				password = req.body.password;
 
 		//数据库操作
 		dbServer.loginCheck(account,password,res);

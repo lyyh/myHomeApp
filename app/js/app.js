@@ -74,9 +74,9 @@
 	owner.setState = function(state) {
 		state = state || {};
 		localStorage.setItem('$state', JSON.stringify(state));
-		//var settings = owner.getSettings();
-		//settings.gestures = '';
-		//owner.setSettings(settings);
+		var settings = owner.getSettings();
+		settings.gestures = '';
+		owner.setSettings(settings);
 	};
 
 	var checkEmail = function(email) {

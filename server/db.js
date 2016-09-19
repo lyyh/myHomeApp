@@ -75,7 +75,7 @@ exports.loginCheck = function(account, password, res) {
 		}, function(callback) {
 			connection.query('SELECT * FROM sys_passport WHERE passport_acc = ? AND passport_pwd = ?', [account, password],
 				function(err, result) {
-					if (result.length == 0) {
+					if (result.length == 0){
 						res.json({
 							success: false,
 							status: status.oprErr,
@@ -109,7 +109,7 @@ exports.loginCheck = function(account, password, res) {
 						})
 						return
 					}
-					login_msg['passport_id'] = passport_id;
+					login_msg['passportId'] = passport_id;
 					callback(err);
 				})
 		}, function(callback) {
