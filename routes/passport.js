@@ -13,7 +13,6 @@ router.post('/register', function(req, res, next) {
 		var account = req.body.account,
 			password = req.body.password,
 			email = req.body.email;
-
 		//数据库操作
 		dbServer.addPassport(account,password,email,res);
 	} else {

@@ -52,21 +52,20 @@
 				var account = doc.getElementById('account');
 
 				$.plusReady(function() {
-					var self = plus.webview.currentWebview();
-					
+					//监听mainPage事件
 					window.addEventListener("mainPage", function(e) {
 						var state_str = localStorage.getItem('user_state'),
 							state_obj = JSON.parse(state_str);
 						account.innerHTML = state_obj.account;
 					});
 					
+					//监听窗口show事件
+					var self = plus.webview.currentWebview();
 					self.addEventListener('show',function(){
 						var state_str = localStorage.getItem('user_state'),
 							state_obj = JSON.parse(state_str);
 						account.innerHTML = state_obj.account;
 					})
-					
-					
 
 					//设置
 					var settingButton = doc.getElementById('setting');

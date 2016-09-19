@@ -78,7 +78,6 @@
 		<script src="js/conf.js" type="text/javascript" charset="utf-8"></script>
 		<script>
 			(function($, doc, $z) {
-
 				$.init();
 				$.plusReady(function() {
 					
@@ -111,12 +110,18 @@
 					
 					//提交数据
 					function postData(reg_data) {
-						$z.ajax({
+					$.ajax({
 							type: "post",
-							contentType: 'application/x-www-form-urlencoded', //跨域请求 用formData格式传输
-							data: 'account=' + reg_data.account + '&password=' + reg_data.password + '&email=' + reg_data.email,
-							url: "http://"+config.ip+":"+config.port+"/passport/register", //请求地址        
+							url: "http://" + config.ip + ":" + config.port + "/passport/register", //请求地址
+							async: true, //同步请求
+							data: {
+								account: reg_data.account,
+								password: reg_data.password,
+								email: reg_data.email
+							},
 							dataType: 'json',
+							crossDomain: true, //强制使用5+跨域
+							timeout: 10000,
 							success: function(data) {
 								if(data.success) {
 									plus.nativeUI.toast(data.msg);
@@ -130,6 +135,9 @@
 								} else {
 									plus.nativeUI.toast(data.msg);
 								}
+							},
+							error: function(xhr, type, errorThrown) {
+								plus.nativeUI.toast('操作失败');
 							}
 						});
 					}

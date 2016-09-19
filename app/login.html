@@ -138,7 +138,6 @@
 				$.plusReady(function() {
 					plus.screen.lockOrientation("portrait-primary");
 					var settings = app.getSettings();
-//					localStorage.clear()
 
 					var mainPage = $.preload({
 						url: "main.html",
@@ -147,7 +146,7 @@
 
 					//跳转到主页面
 					var toMain = function(login_msg) {
-						console.log(123)
+						
 						//在本地保存登录状态
 						if(typeof login_msg === 'object' || login_msg){
 							localStorage.setItem("user_state", JSON.stringify(login_msg));
@@ -204,6 +203,7 @@
 								}
 							},
 							error: function(xhr, type, errorThrown) {
+								console.log(123)
 								plus.nativeUI.toast('操作失败');
 							}
 						});
@@ -296,7 +296,6 @@
 								plus.nativeUI.toast(err);
 								return;
 							}
-							console.log(111)
 							//进行登录
 							doLogin(loginInfo);
 						})
